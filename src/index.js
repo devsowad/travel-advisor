@@ -11,6 +11,7 @@ import App from './App';
 
 const theme = createTheme({
   palette: {
+    type: 'dark',
     primary: {
       main: purple[500],
     },
