@@ -14,8 +14,11 @@ import React from 'react';
 
 import useStyles from './style';
 
-const PlaceDetails = ({ place }) => {
+const PlaceDetails = ({ place, selected, refProp }) => {
   const { chip, subtitle, spacing } = useStyles();
+
+  if (selected)
+    refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   return (
     <Card elevation={6}>

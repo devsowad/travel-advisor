@@ -5,18 +5,34 @@ import {
   Typography,
   MenuItem,
   Grid,
+  CircularProgress,
 } from '@material-ui/core';
-import React, { useState } from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 
 import useStyles from './style';
 
-const List = ({ places }) => {
+const List = ({
+  places,
+  childClick,
+  isLoading,
+  type,
+  setType,
+  rating,
+  setRating,
+}) => {
   const { container, formControl, list, loading, marginBottom, selectEmpty } =
     useStyles();
 
-  const [type, setType] = useState('restaurant');
-  const [rating, setRating] = useState(0);
+  const [elRefs, setElRefs] = useState([]);
+
+  useEffect(() => {
+    const refs = Array(places?.length)
+      .fill()
+      .map((_, i) => elRefs[i] || createRef());
+
+    setElRefs(refs);
+  }, [places]);
 
   return (
     <div className={container}>
@@ -26,7 +42,7 @@ const List = ({ places }) => {
       <FormControl variant='filled' className={formControl}>
         <InputLabel>Type</InputLabel>
         <Select value={type} onChange={e => setType(e.target.value)}>
-          <MenuItem value='restaurant'>Restaurant</MenuItem>
+          <MenuItem value='restaurants'>Restaurants</MenuItem>
           <MenuItem value='hotels'>Hotels</MenuItem>
           <MenuItem value='attractions'>Attractions</MenuItem>
         </Select>
@@ -41,16 +57,31 @@ const List = ({ places }) => {
         </Select>
       </FormControl>
 
-      <Grid container spacing={3} className={list}>
-        {places?.map(
-          (place, i) =>
-            place.name && (
-              <Grid item key={`${place.name}-restaurant`} xs={12}>
-                <PlaceDetails place={place} />
-              </Grid>
-            )
-        )}
-      </Grid>
+      {isLoading ? (
+        <div className={loading}>
+          <CircularProgress />
+        </div>
+      ) : (
+        <Grid container spacing={3} className={list}>
+          {places?.map(
+            (place, i) =>
+              place.name && (
+                <Grid
+                  ref={elRefs[i]}
+                  item
+                  key={`${place.name}-restaurant`}
+                  xs={12}
+                >
+                  <PlaceDetails
+                    place={place}
+                    selected={Number(childClick) === i}
+                    refProp={elRefs[i]}
+                  />
+                </Grid>
+              )
+          )}
+        </Grid>
+      )}
     </div>
   );
 };
